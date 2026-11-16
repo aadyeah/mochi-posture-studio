@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mochi's Posture Studio • 3D AI Ergonomics & Focus Coach</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ffd6e0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Quicksand:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js for End-of-Session Report -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="bg-blob blob-pink"></div>
+  <div class="bg-blob blob-lavender"></div>
+  <div class="bg-blob blob-mint"></div>
+
+  <div class="studio-wrapper">
+   <!-- Top Header & Navigation (Single-Row Sleek Layout) -->
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-pill">✨ 3D AI</span>
+        <h1>Mochi’s Posture Studio</h1>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Studio Pages">
+        <button class="nav-tab active" data-page="studioPage">💻 Live Studio</button>
+        <button class="nav-tab" data-page="shopPage">🛍️ Shop</button>
+        <button class="nav-tab" data-page="tipsPage">🧘 Stretches</button>
+        <button class="nav-tab" data-page="benefitsPage">💖 Benefits & 3D AI</button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="streak-pill" title="Earn a star every 15s of good posture!">
+          <span>🌸</span>
+          <strong id="starsCount">0</strong>
+        </div>
+        <button id="pipBtn" class="btn btn-soft" title="Pop out mini Mochi window while coding!">🪟 Pop-Out</button>
+        <button id="notifBtn" class="btn btn-soft" title="Desktop alerts while coding">🔔 OFF</button>
+        <button id="audioBtn" class="btn btn-soft">🔊 ON</button>
+        <button id="toggleBtn" class="btn btn-primary" disabled>Loading 3D AI...</button>
+      </div>
+    </header>
+    <!-- ========================================================= -->
+    <!-- PAGE 1: LIVE STUDIO                                       -->
+    <!-- ========================================================= -->
+    <section id="studioPage" class="page-view active">
+      <main class="workspace">
+        <!-- LEFT: Pastel Laptop Frame -->
+        <section class="laptop-stage">
+          <div class="laptop-lid">
+            <div class="laptop-camera-bar">
+              <span class="cam-dot"></span>
+              <span class="cam-label">MOCHI-CAM • 3D FACE + POSE</span>
+              <span id="fpsChip" class="fps-chip">-- FPS</span>
+            </div>
+
+            <div class="laptop-screen">
+              <video id="webcam" playsinline muted></video>
+              <canvas id="overlay"></canvas>
+
+              <!-- Start Placeholder -->
+              <div id="screenPlaceholder" class="screen-placeholder">
+                <div class="placeholder-icon">💻🌸</div>
+                <h3>Ready for a cozy, pain-free study session?</h3>
+                <p>Click <strong>Start Camera</strong> for a quick 4-second 2-point calibration!</p>
+              </div>
+
+              <!-- 2-Step Guided Calibration Overlay -->
+              <div id="calibOverlay" class="calib-overlay hidden">
+                <div class="calib-card">
+                  <span id="calibStepBadge" class="brand-pill">Step 1 of 2</span>
+                  <h3 id="calibTitle">Sit Comfortably Upright ✨</h3>
+                  <p id="calibDesc">Hold your natural good posture for 2 seconds...</p>
+                  <div class="progress-track">
+                    <div id="calibProgressBar" class="progress-fill"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="statusBadge" class="status-pill neutral">💤 Waiting to start</div>
+            </div>
+          </div>
+
+          <div class="laptop-base"><div class="laptop-notch"></div></div>
+          <div class="laptop-shadow"></div>
+
+          <!-- Bottom Quick Bar: Recalibrate + Pomodoro Focus Timer -->
+          <div class="studio-bottom-bar">
+            <button id="recalibrateBtn" class="btn btn-soft" disabled>🎯 2-Point Calibrate</button>
+
+            <div class="pomodoro-pill">
+              <span id="pomoModeLabel">🍅 Focus</span>
+              <strong id="pomoDisplay">25:00</strong>
+              <button id="pomoToggleBtn" class="btn-mini">▶ Start</button>
+              <button id="pomoResetBtn" class="btn-mini">↺</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT: Mochi Mascot + Metrics -->
+        <aside class="companion-column">
+          <div id="mascotCard" class="mascot-card mood-happy">
+            <div class="speech-bubble" id="speechBubble">
+              Hi friend! Start the camera so Mochi can learn your upright &amp; slouch poses! 🌸
+            </div>
+
+            <div class="mascot-stage">
+              <svg id="mochiSvg" viewBox="0 0 220 205" class="mochi-svg" aria-label="Mochi the Posture Cat">
+                <!-- Happy FX -->
+                <g class="fx-happy">
+                  <text x="18" y="48" font-size="20" class="float-1">💖</text>
+                  <text x="176" y="42" font-size="18" class="float-2">✨</text>
+                  <text x="182" y="95" font-size="16" class="float-3">🌸</text>
+                </g>
+
+                <!-- Angry FX -->
+                <g class="fx-angry">
+                  <text x="168" y="46" font-size="24" class="shake-fx">💢</text>
+                  <text x="18" y="52" font-size="20" class="shake-fx">😤</text>
+                </g>
+
+                <!-- Swishing Tail -->
+                <path class="cat-tail" d="M162 152 Q198 135 190 105 Q186 92 176 98" fill="none" stroke="#f4a261" stroke-width="14" stroke-linecap="round" />
+
+                <!-- Sweater Body -->
+                <ellipse cx="110" cy="162" rx="54" ry="36" fill="#ffd6e0" stroke="#5c4b51" stroke-width="3.5" />
+                <path d="M84 134 Q110 148 136 134" fill="none" stroke="#ff8fab" stroke-width="4" stroke-linecap="round" />
+                <text x="102" y="168" font-size="16">🍓</text>
+
+                <!-- Ears -->
+                <polygon points="56,82 46,32 90,58" fill="#fff8f0" stroke="#5c4b51" stroke-width="3.5" stroke-linejoin="round" />
+                <polygon points="60,74 53,42 82,60" fill="#ffb3c6" />
+                <polygon points="164,82 174,32 130,58" fill="#f4a261" stroke="#5c4b51" stroke-width="3.5" stroke-linejoin="round" />
+                <polygon points="160,74 167,42 138,60" fill="#ffb3c6" />
+
+                <!-- Head -->
+                <ellipse cx="110" cy="96" rx="64" ry="52" fill="#fff8f0" stroke="#5c4b51" stroke-width="3.5" />
+                <path d="M132 48 Q166 56 170 88 Q148 92 134 74 Z" fill="#f4a261" opacity="0.85" />
+
+                <!-- UNLOCKABLE ACCESSORY 1: STRAWBERRY BERET -->
+                <g id="accBeret" class="accessory hidden">
+                  <ellipse cx="88" cy="44" rx="34" ry="15" transform="rotate(-14 88 44)" fill="#ff758f" stroke="#5c4b51" stroke-width="3" />
+                  <path d="M84 30 Q88 21 93 29" fill="none" stroke="#5c4b51" stroke-width="3" stroke-linecap="round" />
+                </g>
+
+                <!-- Rosy Cheeks -->
+                <ellipse cx="72" cy="108" rx="11" ry="6.5" fill="#ff8fab" opacity="0.65" />
+                <ellipse cx="148" cy="108" rx="11" ry="6.5" fill="#ff8fab" opacity="0.65" />
+
+                <!-- HAPPY EXPRESSION -->
+                <g class="expr-happy">
+                  <path d="M74 92 Q84 80 94 92" fill="none" stroke="#5c4b51" stroke-width="4" stroke-linecap="round" />
+                  <path d="M126 92 Q136 80 146 92" fill="none" stroke="#5c4b51" stroke-width="4" stroke-linecap="round" />
+                  <path d="M98 112 Q104 120 110 112 Q116 120 122 112" fill="none" stroke="#5c4b51" stroke-width="3.5" stroke-linecap="round" />
+                </g>
+
+                <!-- WARN EXPRESSION -->
+                <g class="expr-warn">
+                  <circle cx="84" cy="90" r="7" fill="#5c4b51" />
+                  <circle cx="82" cy="88" r="2.5" fill="#ffffff" />
+                  <circle cx="136" cy="90" r="7" fill="#5c4b51" />
+                  <circle cx="134" cy="88" r="2.5" fill="#ffffff" />
+                  <line x1="72" y1="78" x2="92" y2="82" stroke="#5c4b51" stroke-width="3" stroke-linecap="round" />
+                  <line x1="148" y1="78" x2="128" y2="82" stroke="#5c4b51" stroke-width="3" stroke-linecap="round" />
+                  <ellipse cx="110" cy="116" rx="6" ry="5" fill="#ff8fab" stroke="#5c4b51" stroke-width="2.5" />
+                </g>
+
+                <!-- ANGRY EXPRESSION -->
+                <g class="expr-angry">
+                  <circle cx="84" cy="93" r="7.5" fill="#d90429" />
+                  <circle cx="82" cy="91" r="2" fill="#ffffff" />
+                  <circle cx="136" cy="93" r="7.5" fill="#d90429" />
+                  <circle cx="134" cy="91" r="2" fill="#ffffff" />
+                  <line x1="70" y1="76" x2="96" y2="86" stroke="#5c4b51" stroke-width="4.5" stroke-linecap="round" />
+                  <line x1="150" y1="76" x2="124" y2="86" stroke="#5c4b51" stroke-width="4.5" stroke-linecap="round" />
+                  <path d="M96 118 Q110 107 124 118" fill="none" stroke="#5c4b51" stroke-width="4" stroke-linecap="round" />
+                </g>
+
+                <!-- UNLOCKABLE ACCESSORY 2: ROUND READING GLASSES -->
+                <g id="accGlasses" class="accessory hidden">
+                  <circle cx="84" cy="91" r="16" fill="rgba(255,255,255,0.22)" stroke="#8b5cf6" stroke-width="3" />
+                  <circle cx="136" cy="91" r="16" fill="rgba(255,255,255,0.22)" stroke="#8b5cf6" stroke-width="3" />
+                  <line x1="100" y1="91" x2="120" y2="91" stroke="#8b5cf6" stroke-width="3" />
+                </g>
+
+                <!-- Nose & Whiskers -->
+                <polygon points="105,102 115,102 110,108" fill="#ff758f" />
+                <line x1="42" y1="98" x2="64" y2="101" stroke="#5c4b51" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="44" y1="108" x2="64" y2="107" stroke="#5c4b51" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="178" y1="98" x2="156" y2="101" stroke="#5c4b51" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="176" y1="108" x2="156" y2="107" stroke="#5c4b51" stroke-width="2.5" stroke-linecap="round" />
+
+                <!-- UNLOCKABLE ACCESSORY 3: MATCHA LATTE MUG -->
+                <g id="accMatcha" class="accessory hidden">
+                  <rect x="34" y="152" width="28" height="32" rx="7" fill="#d0f4de" stroke="#5c4b51" stroke-width="3" />
+                  <path d="M62 160 Q72 160 72 168 Q72 176 62 176" fill="none" stroke="#5c4b51" stroke-width="3" />
+                  <text x="41" y="173" font-size="13">🍵</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Telemetry Mini Cards -->
+          <div class="mini-metrics">
+            <div class="stat-box pink-tint">
+              <span class="stat-label">3D Posture</span>
+              <strong id="angleValue">--%</strong>
+              <small id="angleHint">Goal &ge; 74%</small>
+            </div>
+
+            <div class="stat-box lavender-tint">
+              <span class="stat-label">Slouch Timer</span>
+              <strong id="slouchTimer">0.0s</strong>
+              <small>Alert at <span id="delayDisplay">3</span>s</small>
+            </div>
+
+            <div class="stat-box mint-tint">
+              <span class="stat-label">Session Avg</span>
+              <strong id="scoreValue">100%</strong>
+              <small>Upright %</small>
+            </div>
+          </div>
+
+          <!-- Sensitivity Calibration Card -->
+          <div class="settings-card">
+            <h3>🎛️ Comfort &amp; Hysteresis</h3>
+            <label for="leniencySlider">
+              Strictness: <strong id="leniencyLabel">Balanced</strong>
+            </label>
+            <input type="range" id="leniencySlider" min="1" max="3" step="1" value="2" />
+
+            <label for="delaySlider">
+              Mochi Patience Delay: <strong id="delayThreshLabel">3s</strong>
+            </label>
+            <input type="range" id="delaySlider" min="2" max="15" value="3" />
+          </div>
+        </aside>
+      </main>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PAGE 2: MOCHI'S COZY STAR SHOP                            -->
+    <!-- ========================================================= -->
+    <section id="shopPage" class="page-view">
+      <div class="page-banner banner-pink">
+        <div>
+          <h2>🛍️ Mochi’s Cozy Accessory Shop</h2>
+          <p>Earn <strong>🌸 1 Focus Star</strong> every 15 seconds of healthy posture, then dress up your study buddy!</p>
+        </div>
+        <div class="streak-pill" style="font-size: 1.05rem;">
+          <span>Available Stars:</span>
+          <strong id="shopStarsBalance">0</strong> 🌸
+        </div>
+      </div>
+
+      <div class="cards-grid three-col">
+        <article class="pastel-card card-lavender">
+          <div class="card-emoji">👓</div>
+          <h4>Scholar Round Glasses</h4>
+          <p>Cute lavender wire-frame glasses for late-night DSA &amp; engineering study sessions.</p>
+          <button class="btn btn-primary shop-buy-btn" data-item="accGlasses" data-cost="2">Unlock • 2 🌸</button>
+        </article>
+
+        <article class="pastel-card card-pink">
+          <div class="card-emoji">🍓</div>
+          <h4>Strawberry Artist Beret</h4>
+          <p>A soft pastel pink beret that sits right between Mochi’s calico ears.</p>
+          <button class="btn btn-primary shop-buy-btn" data-item="accBeret" data-cost="4">Unlock • 4 🌸</button>
+        </article>
+
+        <article class="pastel-card card-mint">
+          <div class="card-emoji">🍵</div>
+          <h4>Warm Matcha Latte</h4>
+          <p>Places a steaming cup of ceremonial matcha right next to Mochi on your desk.</p>
+          <button class="btn btn-primary shop-buy-btn" data-item="accMatcha" data-cost="6">Unlock • 6 🌸</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- PAGE 3: POSTURE SUGGESTIONS & STRETCH TIMER               -->
+    <!-- ========================================================= -->
+    <section id="tipsPage" class="page-view">
+      <div class="page-banner banner-pink">
+        <div>
+          <h2>🧘 Mochi’s Cozy Desk &amp; Posture Guide</h2>
+          <p>Small ergonomic tweaks + 30-second micro-breaks prevent neck strain during long laptop sessions.</p>
+        </div>
+        <div class="stretch-timer-box">
+          <span>30s Break Timer</span>
+          <div class="timer-controls">
+            <strong id="stretchCountdown">00:30</strong>
+            <button id="startStretchBtn" class="btn btn-primary">▶ Start 30s Stretch</button>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-heading">✨ The 4 Golden Rules of Laptop Ergonomics</h3>
+      <div class="cards-grid four-col">
+        <article class="pastel-card card-cream">
+          <div class="card-emoji">🖥️</div>
+          <h4>Eye-Level Screen</h4>
+          <p>Raise your laptop on books or a stand so the top third of your display meets your eye line.</p>
+          <span class="tag-pill">Prevents Tech-Neck</span>
+        </article>
+        <article class="pastel-card card-pink">
+          <div class="card-emoji">📐</div>
+          <h4>The 90–90–90 Rule</h4>
+          <p>Keep elbows, hips, and knees at 90° angles with both feet resting flat on the floor.</p>
+          <span class="tag-pill">Balanced Spine</span>
+        </article>
+        <article class="pastel-card card-lavender">
+          <div class="card-emoji">🦒</div>
+          <h4>Tall Neck, Soft Shoulders</h4>
+          <p>Drop your shoulders away from your ears and imagine lifting the crown of your head upward.</p>
+          <span class="tag-pill">Zero Tension</span>
+        </article>
+        <article class="pastel-card card-mint">
+          <div class="card-emoji">⏱️</div>
+          <h4>20–20–20 Reset</h4>
+          <p>Every 20 minutes, look 20 feet away for 20 seconds and roll your shoulders back 5 times.</p>
+          <span class="tag-pill">Eye &amp; Muscle Relief</span>
+        </article>
+      </div>
+
+      <h3 class="section-heading">🌸 30-Second Desk Stretches</h3>
+      <div class="cards-grid three-col">
+        <article class="pastel-card">
+          <span class="step-badge">Stretch 01 • Neck</span>
+          <h4>🐢 Turtle Chin Tucks</h4>
+          <p>Gently glide your chin straight back while looking ahead. Hold 5 seconds, repeat 5 times.</p>
+        </article>
+        <article class="pastel-card">
+          <span class="step-badge">Stretch 02 • Chest</span>
+          <h4>🦋 Cactus Arm Opener</h4>
+          <p>Raise arms into a goalpost “W”, squeeze shoulder blades together, and hold for 15 seconds.</p>
+        </article>
+        <article class="pastel-card">
+          <span class="step-badge">Stretch 03 • Upper Back</span>
+          <h4>🐱 Seated Cat-Cow</h4>
+          <p>Hands on knees: inhale lifting your chest forward; exhale rounding your upper back gently.</p>
+        </article>
+      </div>
+    </section>
+
+    
+  <!-- ========================================================= -->
+    <!-- PAGE 4: UPGRADED BENEFITS & 3D AI ARCHITECTURE            -->
+    <!-- ========================================================= -->
+    <section id="benefitsPage" class="page-view">
+      <div class="page-banner banner-lavender">
+        <div>
+          <span class="brand-pill" style="margin-bottom: 0.45rem;">🔬 Ergonomics + Computer Vision</span>
+          <h2>💖 Why Upright Posture Supercharges Your Brain & Body</h2>
+          <p>Explore the biomechanics behind tech-neck and how Mochi’s 3D MediaPipe pipeline protects your spine in real time.</p>
+        </div>
+        <div class="banner-stat-chip">
+          <span>Cervical Spine Relief</span>
+          <strong>Up to 80% Less Strain ✨</strong>
+        </div>
+      </div>
+
+      <!-- 3 Core Science Benefit Cards -->
+      <h3 class="section-heading">🌈 Science-Backed Benefits of Healthy Alignment</h3>
+      <div class="cards-grid three-col">
+        <article class="pastel-card card-mint">
+          <div class="card-top-row">
+            <span class="card-emoji">🧠</span>
+            <span class="metric-chip chip-mint">+30% Lung Capacity</span>
+          </div>
+          <h4>Deeper Oxygen & Laser Focus</h4>
+          <p>Slouching compresses your diaphragm and restricts rib expansion. Sitting tall opens your chest, delivering steady oxygen to your brain during exams and coding marathons.</p>
+        </article>
+
+        <article class="pastel-card card-pink">
+          <div class="card-top-row">
+            <span class="card-emoji">🦒</span>
+            <span class="metric-chip chip-pink">5 kg → 27 kg Load</span>
+          </div>
+          <h4>Eliminates “Tech-Neck” Pressure</h4>
+          <p>In neutral alignment, your head weighs ~5 kg. Tilting forward just 45° multiplies gravitational torque on your cervical spine to <strong>27 kg</strong>—the weight of a heavy suitcase.</p>
+        </article>
+
+        <article class="pastel-card card-lavender">
+          <div class="card-top-row">
+            <span class="card-emoji">⚡</span>
+            <span class="metric-chip chip-lavender">Zero Trapezius Fatigue</span>
+          </div>
+          <h4>All-Day Study Stamina</h4>
+          <p>Balanced shoulder symmetry prevents upper-back muscle knots, tension headaches, and afternoon energy crashes during multi-hour study blocks.</p>
+        </article>
+      </div>
+
+      <!-- Visual Neck Load Progression Bar -->
+      <div class="pastel-card card-cream" style="margin-top: 1.2rem;">
+        <div class="card-top-row" style="margin-bottom: 0.65rem;">
+          <h4>📐 Biomechanical Head-Tilt Force Scale</h4>
+          <span class="tag-pill">Why Mochi Watches Your 3D Pitch Angle</span>
+        </div>
+        <div class="load-bars-grid">
+          <div class="load-item">
+            <div class="load-meta"><span>0° Neutral Upright</span><strong>5 kg (1x)</strong></div>
+            <div class="load-track"><div class="load-fill fill-good" style="width: 20%;"></div></div>
+          </div>
+          <div class="load-item">
+            <div class="load-meta"><span>15° Slight Screen Lean</span><strong>12 kg (2.4x)</strong></div>
+            <div class="load-track"><div class="load-fill fill-warn" style="width: 45%;"></div></div>
+          </div>
+          <div class="load-item">
+            <div class="load-meta"><span>30° Laptop Hunch</span><strong>18 kg (3.6x)</strong></div>
+            <div class="load-track"><div class="load-fill fill-orange" style="width: 68%;"></div></div>
+          </div>
+          <div class="load-item">
+            <div class="load-meta"><span>45° Deep Phone/Desk Slouch</span><strong>27 kg (5.4x)</strong></div>
+            <div class="load-track"><div class="load-fill fill-bad" style="width: 100%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Computer Vision Architecture -->
+      <h3 class="section-heading">🤖 Under the Hood: 3D Multi-Landmark Computer Vision</h3>
+      <div class="tech-showcase">
+        <div class="pastel-card card-cream">
+          <h4>1. Dual-Model 3D Landmark Fusion (WebGL GPU)</h4>
+          <p>
+            Unlike basic 2D pose detectors that confuse glancing down at your keyboard with slouching, Mochi runs <strong>MediaPipe Pose + Face Landmarker</strong> locally on your GPU—fusing <strong>3D metric Z-depth</strong> (head moving closer than shoulders), <strong>3D head pitch</strong>, and <strong>ear-to-shoulder lift</strong>.
+          </p>
+          <div class="pipeline-steps">
+            <span class="pipe-node">📷 60 FPS Frame</span>
+            <span>→</span>
+            <span class="pipe-node">🧠 3D World Z + Pitch</span>
+            <span>→</span>
+            <span class="pipe-node">🐱 Hysteresis Score</span>
+          </div>
+        </div>
+
+        <div class="pastel-card card-cream">
+          <h4>2. Personalized 2-Point Interpolation Formula</h4>
+          <p>
+            During onboarding, Mochi samples 30 frames of your <strong>Upright (S<sub>upright</sub>)</strong> and <strong>Slouched (S<sub>slouch</sub>)</strong> posture vectors to normalize your live score with a 6% anti-flicker hysteresis dead-zone:
+          </p>
+          <div class="fraction-box" aria-label="Score equals 100 times S_live minus S_slouch divided by S_upright minus S_slouch">
+            <span>Score (%) = 100 ×</span>
+            <div class="fraction">
+              <span class="numerator">S<sub>live</sub> − S<sub>slouch</sub></span>
+              <span class="denominator">S<sub>upright</sub> − S<sub>slouch</sub></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  <!-- ========================================================= -->
+  <!-- END-OF-SESSION REPORT MODAL (WITH CHART.JS)               -->
+  <!-- ========================================================= -->
+  <div id="reportModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <span class="brand-pill">📊 Session Summary</span>
+      <h2>Mochi’s Posture Report Card</h2>
+      <p id="reportSubtitle" class="subtitle">Great work keeping your spine healthy!</p>
+
+      <div class="mini-metrics" style="margin: 1rem 0;">
+        <div class="stat-box pink-tint">
+          <span class="stat-label">Duration</span>
+          <strong id="repDuration">0m 0s</strong>
+        </div>
+        <div class="stat-box mint-tint">
+          <span class="stat-label">Upright Avg</span>
+          <strong id="repAvgScore">100%</strong>
+        </div>
+        <div class="stat-box lavender-tint">
+          <span class="stat-label">Stars Earned</span>
+          <strong id="repStars">0 🌸</strong>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <canvas id="sessionChart"></canvas>
+      </div>
+
+      <div class="modal-actions">
+        <button id="downloadReportBtn" class="btn btn-soft">💾 Download JSON</button>
+        <button id="closeModalBtn" class="btn btn-primary">✨ Back to Studio</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
