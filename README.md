@@ -179,12 +179,6 @@ Mochi is a wellness and ergonomics aid, **not a medical device**. It can't diagn
 
 ---
 
-## 📄 License
-
-Released under the **MIT License**. Add a `LICENSE` file to your repo, or swap this section for your preferred license.
-
----
-
 <div align="center">
 
 **Built with 💖, MediaPipe, and a very judgmental cat.**
